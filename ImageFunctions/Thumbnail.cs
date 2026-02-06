@@ -93,10 +93,14 @@ namespace ImageFunctions
                         var blobName = GetBlobNameFromUrl(createdEvent.Url);
 
                         using (var output = new MemoryStream())
-                        using (Image<Rgba32> image = Image.Load(input))
+                        using (Image<Rgba32> image = Image.Load<Rgba32>(input))
                         {
-                            var divisor = image.Width / thumbnailWidth;
-                            var height = Convert.ToInt32(Math.Round((decimal)(image.Height / divisor)));
+                            if (thumbnailWidth >= image.Width)
+                            {
+                                thumbnailWidth = image.Width;
+                            }
+                            var ratio = (double)image.Width / thumbnailWidth;
+                            var height = Convert.ToInt32(Math.Round(image.Height / ratio)); 
 
                             image.Mutate(x => x.Resize(thumbnailWidth, height));
                             image.Save(output, encoder);
